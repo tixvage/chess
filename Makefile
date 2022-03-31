@@ -3,7 +3,7 @@ CFLAGS = -std=c11 -O3 -g -Wall -Wextra -Wpedantic -Wstrict-aliasing
 CFLAGS += -Wno-pointer-arith -Wno-newline-eof -Wno-unused-parameter -Wno-gnu-statement-expression
 CFLAGS += -Wno-gnu-compound-literal-initializer -Wno-gnu-zero-variadic-macro-arguments
 CFLAGS += -Ivendor/raylib/src
-LDFLAGS += vendor/raylib/src/libraylib.a -ldl -lpthread
+LDFLAGS += vendor/raylib/src/libraylib.a -ldl -lpthread -lm
 
 SRC  = $(wildcard src/**/*.c) $(wildcard src/*.c)
 OBJ_DIR = build
