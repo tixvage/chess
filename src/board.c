@@ -19,15 +19,22 @@ Board create_board(){
         .x = 8,
         .y = 8,
         .texture = texture,
+        .manager = create_piece_manager("assets/spritesheet.png"),
     };
 }
 
 void destroy_board(Board* self){
     UnloadRenderTexture(self->texture);
+    destroy_piece_manager(self->manager);
 }
 
 void draw_board(Board* self){
-    DrawTextureRec(self->texture.texture, (Rectangle){ 0, 0, self->texture.texture.width, -self->texture.texture.height }, (Vector2){ 0, 0 }, WHITE);
+    DrawTextureRec(self->texture.texture,
+                   (Rectangle){ 0, 0, self->texture.texture.width, -self->texture.texture.height },
+                   (Vector2){ 0, 0 },
+                   WHITE);
+
+    draw_piece_manager(self->manager);
 }
 
 bool is_color_equal(Color c1, Color c2){

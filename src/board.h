@@ -3,12 +3,13 @@
 
 #include "stdint.h"
 #include "raylib.h"
+#include "pieces.h"
 
 typedef struct Board Board;
-
 struct Board{
     int32_t x, y;
     RenderTexture2D texture;
+    PieceManager* manager;
 };
 
 Board create_board();

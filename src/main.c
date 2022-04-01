@@ -5,6 +5,7 @@
 #include <raylib.h>
 
 #include "board.h"
+#include "pieces.h"
 
 int main(void){
     InitWindow(800, 800, "Chess");
@@ -16,6 +17,7 @@ int main(void){
 
     printf("%d\n", test.width);
     printf("%d\n", test.height);
+    printf("%d\n", sizeof(VTablePiece));
     
     while(!WindowShouldClose()){
         BeginDrawing();
