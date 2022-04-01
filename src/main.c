@@ -11,11 +11,21 @@ int main(void){
     SetTargetFPS(120);
 
     Board board = create_board();
+
+    Texture2D test = LoadTexture("assets/spritesheet.png");
+
+    printf("%d\n", test.width);
+    printf("%d\n", test.height);
     
     while(!WindowShouldClose()){
         BeginDrawing();
-        ClearBackground(GRAY);
+        ClearBackground(WHITE);
         draw_board(&board);
+        for(int x = 0; x < 10; x++){
+            for(int y = 0; y < 2; y++){
+                DrawTexturePro(test, (Rectangle){x * (test.width / 6), y * (test.height / 2), 314.17, 302.5}, (Rectangle){(x * 100), (y * 100), test.width / 18, test.height / 6}, (Vector2){0, 0}, 0, WHITE);
+            }
+        }
         EndDrawing();
     }
 
