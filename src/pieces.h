@@ -12,19 +12,44 @@
 
 #include "raylib.h"
 
-#define POSITION(cc, nn) (Position) {.c = cc, .n = nn}
+#define PIECE(cc, nn, pp) (Piece) {.c = cc, .n = nn, .p = pp}
 
-typedef struct Position Position;
+typedef enum PieceType PieceType;
+typedef enum Player Player;
+
+typedef struct SpriteSheetPosition SpriteSheetPosition;
+typedef struct Piece Piece;
 typedef struct PieceManager PieceManager;
 typedef struct PawnPiece PawnPiece;
 typedef struct VTablePiece VTablePiece;
 
-typedef enum PieceType PieceType;
+enum PieceType{
+    King = 0,
+    Queen = 1,
+    Bishop = 2,
+    Knight = 3,
+    Rook = 4,
+    Pawn = 5,
+};
 
-struct Position{
+enum Player{
+    White = 0,
+    Black = 1,
+};
+
+struct SpriteSheetPosition{
+    Rectangle s;
+    Rectangle d;
+};
+
+struct Piece{
     char c;
     int n;
+    Player p;
+    PieceType t;
 };
+
+SpriteSheetPosition piece_to_ss_position(Piece pos);
 
 struct PieceManager{
     const char* sprite_name;
@@ -40,30 +65,19 @@ void setup_piece_manager(PieceManager* self);
 void draw_piece_manager(PieceManager* self);
 void destroy_piece_manager(PieceManager* self);
 
-enum PieceType{
-    King = 0,
-    Rook = 1,
-    Bishop = 2,
-    Queen = 3,
-    Knight = 4,
-    Pawn = 5,
-};
-
 struct VTablePiece{
-    PieceType (*get_type)();
-    Position (*get_position)(void*);
+    Piece (*get_info)(void*);
 
     void* impl;
 };
 
 struct PawnPiece{
     VTablePiece vtable;
-    Position pos;
+    Piece piece;
 };
 
-PawnPiece* create_pawn(Position pos);
+PawnPiece* create_pawn(Piece piece);
 
-PieceType get_pawn();
-Position get_pawn_pos(PawnPiece* self);
+Piece get_pawn_info(PawnPiece* self);
 
 #endif // PIECES_H
