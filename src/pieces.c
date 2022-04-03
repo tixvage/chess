@@ -24,9 +24,7 @@ SpriteSheetPosition piece_to_ss_position(Piece piece){
 PieceManager* create_piece_manager(const char* sprite_name){
     PieceManager* manager = malloc(sizeof(PieceManager));
 
-    //TODO: an advanced container for pieces (null checks etc...)
-    manager->pieces.data = malloc(32 * sizeof(VTablePiece));
-    manager->pieces.length = 32;
+    manager->pieces = calloc(32, sizeof(VTablePiece));
 
     manager->sprite_name = sprite_name;
     manager->spritesheet = LoadTexture(manager->sprite_name);
@@ -36,21 +34,41 @@ PieceManager* create_piece_manager(const char* sprite_name){
     return manager;
 }
 
+void push_piece(PieceManager* self, VTablePiece piece){
+    for(int i = 0; i < 32; i++){
+        if(self->pieces[i].impl == NULL){
+            printf("%d\n", i);
+            self->pieces[i] = piece;
+            break;
+        }
+    }
+}
+
 void setup_piece_manager(PieceManager* self){
-    PawnPiece* pawn1 = create_pawn(PIECE('a', 2, Black));
-    self->pieces.data[0] = pawn1->vtable;
-    PawnPiece* pawn2 = create_pawn(PIECE('b', 2, Black));
-    self->pieces.data[1] = pawn2->vtable;
+    for(int i = 0; i < 8; i++){
+        //TODO: create_"piece_name" must return void* and then we can call that macro like:
+        //PUSH_PIECE(self, PIECE('a' + i, 2, Black)) // that's better
+        PUSH_PIECE(self, create_pawn(PIECE('a' + i, 2, Black)));
+    }
 }
 
 void draw_piece_manager(PieceManager* self){
-    draw_piece(self->spritesheet, self->pieces.data[0]);
-    draw_piece(self->spritesheet, self->pieces.data[1]);
+    for(int i = 0; i < 32; i++){
+        if(self->pieces[i].impl != NULL){
+            draw_piece(self->spritesheet, self->pieces[i]);
+        }
+    }
 }
 
 void destroy_piece_manager(PieceManager* self){
-    //TODO: memory leak on pieces[].impl
-    free(self->pieces.data);
+    for(int i = 0; i < 32; i++){
+        void* impl = self->pieces[i].impl;
+        if(impl != NULL){
+            free(impl);
+        }
+    }
+
+    free(self->pieces);
     free(self);
 }
 

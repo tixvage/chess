@@ -8,6 +8,7 @@
 
 #define PIECE(cc, nn, pp) (Piece) {.c = cc, .n = nn, .p = pp}
 #define CALL(i, f) i.f(i.impl)
+#define PUSH_PIECE(s, p) push_piece(s, p->vtable)
 
 typedef enum PieceType PieceType;
 typedef enum Player Player;
@@ -49,14 +50,12 @@ SpriteSheetPosition piece_to_ss_position(Piece pos);
 
 struct PieceManager{
     const char* sprite_name;
-    struct{
-        VTablePiece* data;
-        int length;
-    } pieces;
+    VTablePiece* pieces;
     Texture2D spritesheet;
 };
 
 PieceManager* create_piece_manager(const char* sprite_name);
+void push_piece(PieceManager* self, VTablePiece piece);
 void setup_piece_manager(PieceManager* self);
 void draw_piece_manager(PieceManager* self);
 void destroy_piece_manager(PieceManager* self);

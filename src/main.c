@@ -20,7 +20,7 @@ int main(void){
    
     while(!WindowShouldClose()){
         BeginDrawing();
-        ClearBackground(WHITE);
+        ClearBackground(BLACK);
         draw_board(&board);
         EndDrawing();
     }
