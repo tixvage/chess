@@ -34,7 +34,7 @@ void destroy_board(Board* self){
     UnloadRenderTexture(self->texture);
     destroy_piece_manager(self->manager);
 }
-
+ 
 void draw_board(Board* self){
     DrawTextureRec(self->texture.texture,
                    (Rectangle){ 0, 0, self->texture.texture.width, -self->texture.texture.height },
