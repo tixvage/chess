@@ -14,6 +14,7 @@ struct Board{
 
 Board create_board();
 void draw_board(Board* self);
+void update_board(Board* self);
 void destroy_board(Board* self);
 
 bool is_color_equal(Color c1, Color c2);

@@ -37,8 +37,6 @@ PieceManager* create_piece_manager(const char* sprite_name){
 void push_piece(PieceManager* self, Piece piece){
     for(int i = 0; i < 32; i++){
         if(self->pieces[i].impl == NULL){
-            printf("%d\n", i);
-
             VTablePiece vtable = { 0 };
 
             //TODO: add other pieces
@@ -82,7 +80,19 @@ void setup_piece_manager(PieceManager* self){
 
     push_piece(self, PIECE('e', 1, Black, Queen));
     push_piece(self, PIECE('e', 8, White, Queen));
+}
 
+void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
+    for(int i = 0; i < 32; i++){
+        if(self->pieces[i].impl != NULL){
+            VTablePiece vtable = self->pieces[i];
+            Piece piece = CALL(vtable, get_info);
+            SpriteSheetPosition ss_pos = piece_to_ss_position(piece);
+            if(CheckCollisionPointRec(mouse_pos, ss_pos.d)){
+                printf("Clicked-> %c:%d\n", piece.c, piece.n);
+            }
+        }
+    }
 }
 
 void draw_piece_manager(PieceManager* self){

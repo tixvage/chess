@@ -23,6 +23,13 @@ Board create_board(){
     };
 }
 
+void update_board(Board* self){
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+        Vector2 mouse_pos = GetMousePosition();
+        on_mouse_click_piece_manager(self->manager, mouse_pos);
+    }
+}
+
 void destroy_board(Board* self){
     UnloadRenderTexture(self->texture);
     destroy_piece_manager(self->manager);

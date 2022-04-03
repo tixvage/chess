@@ -12,13 +12,9 @@ int main(void){
     SetTargetFPS(120);
 
     Board board = create_board();
-
-    Texture2D test = LoadTexture("assets/spritesheet.png");
-
-    printf("%d\n", test.width);
-    printf("%d\n", test.height);
    
     while(!WindowShouldClose()){
+        update_board(&board);
         BeginDrawing();
         ClearBackground(BLACK);
         draw_board(&board);

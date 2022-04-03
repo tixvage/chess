@@ -56,6 +56,7 @@ struct PieceManager{
 PieceManager* create_piece_manager(const char* sprite_name);
 void push_piece(PieceManager* self, Piece piece);
 void setup_piece_manager(PieceManager* self);
+void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos);
 void draw_piece_manager(PieceManager* self);
 void destroy_piece_manager(PieceManager* self);
 
