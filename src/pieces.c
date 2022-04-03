@@ -43,7 +43,7 @@ void push_piece(PieceManager* self, Piece piece){
 
             //TODO: add other pieces
             switch(piece.t){
-            case Pawn:
+            default: //Just for now
                 vtable = create_pawn(piece)->vtable;
                 break;
             }
@@ -58,6 +58,31 @@ void setup_piece_manager(PieceManager* self){
         push_piece(self, PIECE('a' + i, 2, Black, Pawn));
         push_piece(self, PIECE('a' + i, 7, White, Pawn));
     }
+
+    push_piece(self, PIECE('a', 1, Black, Rook));
+    push_piece(self, PIECE('h', 1, Black, Rook));
+
+    push_piece(self, PIECE('a', 8, White, Rook));
+    push_piece(self, PIECE('h', 8, White, Rook));
+
+    push_piece(self, PIECE('b', 1, Black, Knight));
+    push_piece(self, PIECE('g', 1, Black, Knight));
+
+    push_piece(self, PIECE('b', 8, White, Knight));
+    push_piece(self, PIECE('g', 8, White, Knight));
+
+    push_piece(self, PIECE('c', 1, Black, Bishop));
+    push_piece(self, PIECE('f', 1, Black, Bishop));
+
+    push_piece(self, PIECE('c', 8, White, Bishop));
+    push_piece(self, PIECE('f', 8, White, Bishop));
+
+    push_piece(self, PIECE('d', 1, Black, King));
+    push_piece(self, PIECE('d', 8, White, King));
+
+    push_piece(self, PIECE('e', 1, Black, Queen));
+    push_piece(self, PIECE('e', 8, White, Queen));
+
 }
 
 void draw_piece_manager(PieceManager* self){
@@ -82,7 +107,6 @@ void destroy_piece_manager(PieceManager* self){
 
 
 PawnPiece* create_pawn(Piece piece){
-    piece.t = Pawn;
     PawnPiece* pawn = malloc(sizeof(PawnPiece));
     *pawn = (PawnPiece){
         .vtable = (VTablePiece){
