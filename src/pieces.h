@@ -6,9 +6,8 @@
 
 #include "raylib.h"
 
-#define PIECE(cc, nn, pp) (Piece) {.c = cc, .n = nn, .p = pp}
+#define PIECE(cc, nn, pp, tt) (Piece) {.c = cc, .n = nn, .p = pp, .t = tt}
 #define CALL(i, f) i.f(i.impl)
-#define PUSH_PIECE(s, p) push_piece(s, p->vtable)
 
 typedef enum PieceType PieceType;
 typedef enum Player Player;
@@ -55,7 +54,7 @@ struct PieceManager{
 };
 
 PieceManager* create_piece_manager(const char* sprite_name);
-void push_piece(PieceManager* self, VTablePiece piece);
+void push_piece(PieceManager* self, Piece piece);
 void setup_piece_manager(PieceManager* self);
 void draw_piece_manager(PieceManager* self);
 void destroy_piece_manager(PieceManager* self);

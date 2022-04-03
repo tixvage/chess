@@ -34,11 +34,20 @@ PieceManager* create_piece_manager(const char* sprite_name){
     return manager;
 }
 
-void push_piece(PieceManager* self, VTablePiece piece){
+void push_piece(PieceManager* self, Piece piece){
     for(int i = 0; i < 32; i++){
         if(self->pieces[i].impl == NULL){
             printf("%d\n", i);
-            self->pieces[i] = piece;
+
+            VTablePiece vtable = { 0 };
+
+            //TODO: add other pieces
+            switch(piece.t){
+            case Pawn:
+                vtable = create_pawn(piece)->vtable;
+                break;
+            }
+            self->pieces[i] = vtable;
             break;
         }
     }
@@ -46,10 +55,8 @@ void push_piece(PieceManager* self, VTablePiece piece){
 
 void setup_piece_manager(PieceManager* self){
     for(int i = 0; i < 8; i++){
-        //TODO: create_"piece_name" must return void* and then we can call that macro like:
-        //PUSH_PIECE(self, PIECE('a' + i, 2, Black, Pawn)) // that's better
-        PUSH_PIECE(self, create_pawn(PIECE('a' + i, 2, Black)));
-        PUSH_PIECE(self, create_pawn(PIECE('a' + i, 7, White)));
+        push_piece(self, PIECE('a' + i, 2, Black, Pawn));
+        push_piece(self, PIECE('a' + i, 7, White, Pawn));
     }
 }
 
