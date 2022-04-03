@@ -47,8 +47,9 @@ void push_piece(PieceManager* self, VTablePiece piece){
 void setup_piece_manager(PieceManager* self){
     for(int i = 0; i < 8; i++){
         //TODO: create_"piece_name" must return void* and then we can call that macro like:
-        //PUSH_PIECE(self, PIECE('a' + i, 2, Black)) // that's better
+        //PUSH_PIECE(self, PIECE('a' + i, 2, Black, Pawn)) // that's better
         PUSH_PIECE(self, create_pawn(PIECE('a' + i, 2, Black)));
+        PUSH_PIECE(self, create_pawn(PIECE('a' + i, 7, White)));
     }
 }
 
