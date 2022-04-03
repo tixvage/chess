@@ -23,9 +23,11 @@ SpriteSheetPosition piece_to_ss_position(Piece piece){
 
 PieceManager* create_piece_manager(const char* sprite_name){
     PieceManager* manager = malloc(sizeof(PieceManager));
-    manager->pieces.data = malloc(32 * sizeof(VTablePiece));
 
+    //TODO: an advanced container for pieces (null checks etc...)
+    manager->pieces.data = malloc(32 * sizeof(VTablePiece));
     manager->pieces.length = 32;
+
     manager->sprite_name = sprite_name;
     manager->spritesheet = LoadTexture(manager->sprite_name);
 
@@ -47,6 +49,7 @@ void draw_piece_manager(PieceManager* self){
 }
 
 void destroy_piece_manager(PieceManager* self){
+    //TODO: memory leak on pieces[].impl
     free(self->pieces.data);
     free(self);
 }

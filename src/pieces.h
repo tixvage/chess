@@ -56,7 +56,7 @@ struct PieceManager{
     Texture2D spritesheet;
 };
 
-PieceManager* create_piece_manager();
+PieceManager* create_piece_manager(const char* sprite_name);
 void setup_piece_manager(PieceManager* self);
 void draw_piece_manager(PieceManager* self);
 void destroy_piece_manager(PieceManager* self);
