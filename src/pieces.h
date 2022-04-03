@@ -1,18 +1,13 @@
 #ifndef PIECES_H
 #define PIECES_H
 
-//for(int x = 0; x < 10; x++){
-//    for(int y = 0; y < 2; y++){
-//        DrawTexturePro(test, (Rectangle){x * (test.width / 6), y * (test.height / 2), 314.17, 302.5}, (Rectangle){(x * 100), (y * 100), test.width / 18, test.height / 6}, (Vector2){0, 0}, 0, WHITE);
-//    }
-//}
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "raylib.h"
 
 #define PIECE(cc, nn, pp) (Piece) {.c = cc, .n = nn, .p = pp}
+#define CALL(i, f) i.f(i.impl)
 
 typedef enum PieceType PieceType;
 typedef enum Player Player;
@@ -49,6 +44,7 @@ struct Piece{
     PieceType t;
 };
 
+void draw_piece(Texture2D spritesheet, VTablePiece piece);
 SpriteSheetPosition piece_to_ss_position(Piece pos);
 
 struct PieceManager{

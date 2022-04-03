@@ -1,6 +1,11 @@
 #include "pieces.h"
 #include <stdio.h>
 
+void draw_piece(Texture2D spritesheet, VTablePiece piece){
+    SpriteSheetPosition ss_pos = piece_to_ss_position(CALL(piece, get_info));
+    DrawTexturePro(spritesheet, ss_pos.s, ss_pos.d, (Vector2){0, 0}, 0, WHITE);
+}
+
 SpriteSheetPosition piece_to_ss_position(Piece piece){
     float s_x, s_y, d_x, d_y = 0.f;
 
@@ -29,17 +34,16 @@ PieceManager* create_piece_manager(const char* sprite_name){
     return manager;
 }
 
-//1884
-//604
-
 void setup_piece_manager(PieceManager* self){
-    PawnPiece* pawn1 = create_pawn(PIECE('d', 4, Black));
+    PawnPiece* pawn1 = create_pawn(PIECE('a', 2, Black));
     self->pieces.data[0] = pawn1->vtable;
+    PawnPiece* pawn2 = create_pawn(PIECE('b', 2, Black));
+    self->pieces.data[1] = pawn2->vtable;
 }
 
 void draw_piece_manager(PieceManager* self){
-    SpriteSheetPosition ss_pos = piece_to_ss_position(self->pieces.data[0].get_info(self->pieces.data[0].impl));
-    DrawTexturePro(self->spritesheet, ss_pos.s, ss_pos.d, (Vector2){0, 0}, 0, WHITE);
+    draw_piece(self->spritesheet, self->pieces.data[0]);
+    draw_piece(self->spritesheet, self->pieces.data[1]);
 }
 
 void destroy_piece_manager(PieceManager* self){
