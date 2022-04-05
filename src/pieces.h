@@ -7,8 +7,8 @@
 
 #include "raylib.h"
 
-#define PIECE(cc, nn, pp, tt) (Piece) {.c = cc, .n = nn, .p = pp, .t = tt}
-#define CALL(i, f) i.f(i.impl)
+#define PIECE(cc, nn, pp, tt) (Piece) {.pl = (Place){ .c = cc, .n = nn}, .p = pp, .t = tt}
+#define CALL(i, f, args...) i.f(i.impl, ##args)
 #define ISNULL(i) (i.impl == NULL)
 
 typedef enum PieceType PieceType;
@@ -16,6 +16,7 @@ typedef enum Player Player;
 
 typedef struct SpriteSheetPosition SpriteSheetPosition;
 typedef struct PawnPiece PawnPiece;
+typedef struct Place Place;
 typedef struct Piece Piece;
 typedef struct PieceManager PieceManager;
 typedef struct VTablePiece VTablePiece;
@@ -39,16 +40,21 @@ struct SpriteSheetPosition{
     Rectangle d;
 };
 
-struct Piece{
+struct Place{
     char c;
     int n;
+};
+
+struct Piece{
+    Place pl;
     Player p;
     PieceType t;
 };
 
 void draw_piece(Texture2D spritesheet, VTablePiece piece);
 SpriteSheetPosition piece_to_ss_position(Piece pos);
-Piece rectangle_to_piece(Rectangle rect);
+Rectangle place_to_rect(Place pl);
+Place rectangle_to_piece(Rectangle rect);
 Rectangle vector_to_rect(Vector2 vec);
 
 struct VTablePiece{
@@ -78,6 +84,8 @@ void destroy_piece_manager(PieceManager* self);
 struct PawnPiece{
     VTablePiece vtable;
     Piece piece;
+    bool first_move;
+    Piece can_go[3];
 };
 
 PawnPiece* create_pawn(Piece piece);

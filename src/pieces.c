@@ -12,8 +12,8 @@ SpriteSheetPosition piece_to_ss_position(Piece piece){
     s_x = piece.t * (1884 / 6);
     s_y = piece.p * (604 / 2);
 
-    d_x = (piece.c - 97) * 100;
-    d_y = (8 - piece.n) * 100;
+    d_x = (piece.pl.c - 97) * 100;
+    d_y = (8 - piece.pl.n) * 100;
 
     return (SpriteSheetPosition){
         .s = (Rectangle){s_x, s_y, 314, 302},
@@ -21,18 +21,21 @@ SpriteSheetPosition piece_to_ss_position(Piece piece){
     };
 }
 
-Piece rectangle_to_piece(Rectangle rect){
-    //100 = (x - 97) * 100
-    //100/100 = x - 97
-    //(100/100) + 97 = x
+Rectangle place_to_rect(Place pl){
+    float x = (pl.c - 97) * 100;
+    float y = (8 - pl.n) * 100;
 
+    return (Rectangle){x, y, 100, 100};
+}
+
+Place rectangle_to_piece(Rectangle rect){
     char c = 0;
     c = (rect.x / 100) + 97;
 
     int n = 0;
     n = -((rect.y / 100) - 8);
 
-    return (Piece){
+    return (Place){
         .c = c,
         .n = n,
     };
@@ -119,8 +122,8 @@ void setup_piece_manager(PieceManager* self){
 
 void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
     if(!ISNULL(self->clicked_piece)){
-        Piece new_pos = rectangle_to_piece(vector_to_rect(mouse_pos));
-        self->clicked_piece.set_pos(self->clicked_piece.impl, new_pos.c, new_pos.n);
+        Place new_pos = rectangle_to_piece(vector_to_rect(mouse_pos));
+        CALL(self->clicked_piece, set_pos, new_pos.c, new_pos.n);
         self->clicked_piece = (VTablePiece){ 0 };
         return;
     }
@@ -132,7 +135,8 @@ void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
             SpriteSheetPosition ss_pos = piece_to_ss_position(piece);
             if(CheckCollisionPointRec(mouse_pos, ss_pos.d)){
                 self->clicked_piece = vtable;
-                printf("Clicked-> %c:%d\n", piece.c, piece.n);
+                CALL(self->clicked_piece, on_click);
+                printf("Clicked-> %c:%d\n", piece.pl.c, piece.pl.n);
                 break;
             }
             self->clicked_piece = (VTablePiece){ 0 };
@@ -175,6 +179,7 @@ PawnPiece* create_pawn(Piece piece){
             .impl = pawn,
         },
         .piece = piece,
+        .first_move = true,
     };
 
     return pawn;
@@ -185,8 +190,8 @@ Piece get_pawn_info(PawnPiece* self){
 }
 
 void set_pawn_pos(PawnPiece* self, char c, int n){
-    self->piece.c = c;
-    self->piece.n = n;
+    self->piece.pl.c = c;
+    self->piece.pl.n = n;
 }
 
 void on_pawn_click(PawnPiece* self){
@@ -194,18 +199,18 @@ void on_pawn_click(PawnPiece* self){
 }
 
 void draw_possible_moves_pawn(PawnPiece* self){
-    Piece position = self->piece;
-    Piece move1 = (Piece){
+    Place position = self->piece.pl;
+    Place move1 = (Place){
         .c = position.c,
         .n = position.n + 1,
     };
-    Piece move2 = (Piece){
+    Place move2 = (Place){
         .c = position.c,
         .n = position.n + 2,
     };
 
-    Rectangle r1 = piece_to_ss_position(move1).d;
-    Rectangle r2 = piece_to_ss_position(move2).d;
+    Rectangle r1 = place_to_rect(move1);
+    Rectangle r2 = place_to_rect(move2);
 
     DrawRectangleRec(r1, (Color){0, 228, 48, 100});
     DrawRectangleRec(r2, (Color){0, 228, 48, 100});
