@@ -21,21 +21,21 @@ SpriteSheetPosition piece_to_ss_position(Piece piece){
     };
 }
 
-Rectangle place_to_rect(Place pl){
+Rectangle place_to_rect(Location pl){
     float x = (pl.c - 97) * 100;
     float y = (8 - pl.n) * 100;
 
     return (Rectangle){x, y, 100, 100};
 }
 
-Place rectangle_to_piece(Rectangle rect){
+Location rectangle_to_piece(Rectangle rect){
     char c = 0;
     c = (rect.x / 100) + 97;
 
     int n = 0;
     n = -((rect.y / 100) - 8);
 
-    return (Place){
+    return (Location){
         .c = c,
         .n = n,
     };
@@ -89,6 +89,10 @@ void push_piece(PieceManager* self, Piece piece){
     }
 }
 
+void add_to_table(Piece* table, Piece piece){
+
+}
+
 void setup_piece_manager(PieceManager* self){
     for(int i = 0; i < 8; i++){
         push_piece(self, PIECE('a' + i, 2, Black, Pawn));
@@ -121,9 +125,11 @@ void setup_piece_manager(PieceManager* self){
 }
 
 void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
+    //TODO: pieces can't move on each others
     if(!ISNULL(self->clicked_piece)){
-        Place new_pos = rectangle_to_piece(vector_to_rect(mouse_pos));
+        Location new_pos = rectangle_to_piece(vector_to_rect(mouse_pos));
         CALL(self->clicked_piece, set_pos, new_pos.c, new_pos.n);
+        CALL(self->clicked_piece, on_move);
         self->clicked_piece = (VTablePiece){ 0 };
         return;
     }
@@ -174,6 +180,7 @@ PawnPiece* create_pawn(Piece piece){
         .vtable = (VTablePiece){
             .get_info = get_pawn_info,
             .set_pos = set_pawn_pos,
+            .on_move = on_pawn_move,
             .on_click = on_pawn_click,
             .draw_possible_moves = draw_possible_moves_pawn,
             .impl = pawn,
@@ -194,17 +201,24 @@ void set_pawn_pos(PawnPiece* self, char c, int n){
     self->piece.pl.n = n;
 }
 
-void on_pawn_click(PawnPiece* self){
+void on_pawn_move(PawnPiece* self){
+    if(self->first_move) self->first_move = false;
+}
 
+void on_pawn_click(PawnPiece* self){
+    if(self->first_move){
+        printf("first_move of pawn\n");
+
+    }
 }
 
 void draw_possible_moves_pawn(PawnPiece* self){
-    Place position = self->piece.pl;
-    Place move1 = (Place){
+    Location position = self->piece.pl;
+    Location move1 = (Location){
         .c = position.c,
         .n = position.n + 1,
     };
-    Place move2 = (Place){
+    Location move2 = (Location){
         .c = position.c,
         .n = position.n + 2,
     };

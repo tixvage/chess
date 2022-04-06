@@ -7,7 +7,7 @@
 
 #include "raylib.h"
 
-#define PIECE(cc, nn, pp, tt) (Piece) {.pl = (Place){ .c = cc, .n = nn}, .p = pp, .t = tt}
+#define PIECE(cc, nn, pp, tt) (Piece) {.pl = (Location){ .c = cc, .n = nn}, .p = pp, .t = tt}
 #define CALL(i, f, args...) i.f(i.impl, ##args)
 #define ISNULL(i) (i.impl == NULL)
 
@@ -16,7 +16,7 @@ typedef enum Player Player;
 
 typedef struct SpriteSheetPosition SpriteSheetPosition;
 typedef struct PawnPiece PawnPiece;
-typedef struct Place Place;
+typedef struct Location Location;
 typedef struct Piece Piece;
 typedef struct PieceManager PieceManager;
 typedef struct VTablePiece VTablePiece;
@@ -28,11 +28,13 @@ enum PieceType{
     Knight = 3,
     Rook = 4,
     Pawn = 5,
+    NoneT = 6,
 };
 
 enum Player{
     White = 0,
     Black = 1,
+    NoneP = 2,
 };
 
 struct SpriteSheetPosition{
@@ -40,27 +42,28 @@ struct SpriteSheetPosition{
     Rectangle d;
 };
 
-struct Place{
+struct Location{
     char c;
     int n;
 };
 
 struct Piece{
-    Place pl;
+    Location pl;
     Player p;
     PieceType t;
 };
 
 void draw_piece(Texture2D spritesheet, VTablePiece piece);
 SpriteSheetPosition piece_to_ss_position(Piece pos);
-Rectangle place_to_rect(Place pl);
-Place rectangle_to_piece(Rectangle rect);
+Rectangle place_to_rect(Location pl);
+Location rectangle_to_piece(Rectangle rect);
 Rectangle vector_to_rect(Vector2 vec);
 
 struct VTablePiece{
     Piece (*get_info)(void*);
     void (*set_pos)(void*, char, int);
     void (*on_click)(void*);
+    void (*on_move)(void*);
     void (*draw_possible_moves)(void*);
 
     void* impl;
@@ -70,12 +73,14 @@ struct PieceManager{
     const char* sprite_name;
     Texture2D spritesheet;
 
+    Piece table[64];
     VTablePiece clicked_piece;
     VTablePiece* pieces;
 };
 
 PieceManager* create_piece_manager(const char* sprite_name);
 void push_piece(PieceManager* self, Piece piece);
+void add_to_table(Piece* table, Piece piece);
 void setup_piece_manager(PieceManager* self);
 void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos);
 void draw_piece_manager(PieceManager* self);
@@ -91,6 +96,7 @@ struct PawnPiece{
 PawnPiece* create_pawn(Piece piece);
 Piece get_pawn_info(PawnPiece* self);
 void set_pawn_pos(PawnPiece* self, char c, int n);
+void on_pawn_move(PawnPiece* self);
 void on_pawn_click(PawnPiece* self);
 void draw_possible_moves_pawn(PawnPiece* self);
 
