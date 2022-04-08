@@ -7,7 +7,7 @@
 
 #include "raylib.h"
 
-#define PIECE(cc, nn, pp, tt) (Piece) {.pl = (Location){ .c = cc, .n = nn}, .p = pp, .t = tt}
+#define PIECE(cc, nn, pp, tt) (Piece) {.l = (Location){ .c = cc, .n = nn}, .p = pp, .t = tt}
 #define CALL(i, f, args...) i.f(i.impl, ##args)
 #define ISNULL(i) (i.impl == NULL)
 
@@ -48,14 +48,15 @@ struct Location{
 };
 
 struct Piece{
-    Location pl;
+    Location l;
     Player p;
     PieceType t;
 };
 
+bool is_piece_null(Piece p);
 void draw_piece(Texture2D spritesheet, VTablePiece piece);
 SpriteSheetPosition piece_to_ss_position(Piece pos);
-Rectangle place_to_rect(Location pl);
+Rectangle place_to_rect(Location l);
 Location rectangle_to_piece(Rectangle rect);
 Rectangle vector_to_rect(Vector2 vec);
 
@@ -73,7 +74,7 @@ struct PieceManager{
     const char* sprite_name;
     Texture2D spritesheet;
 
-    Piece table[64];
+    Piece table[8][8];
     VTablePiece clicked_piece;
     VTablePiece* pieces;
 };
@@ -90,10 +91,11 @@ struct PawnPiece{
     VTablePiece vtable;
     Piece piece;
     bool first_move;
-    Piece can_go[3];
+    Piece (*table)[8];
+    Piece can_go[4];
 };
 
-PawnPiece* create_pawn(Piece piece);
+PawnPiece* create_pawn(Piece piece, Piece (*table)[8]);
 Piece get_pawn_info(PawnPiece* self);
 void set_pawn_pos(PawnPiece* self, char c, int n);
 void on_pawn_move(PawnPiece* self);

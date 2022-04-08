@@ -1,9 +1,23 @@
 #include "pieces.h"
 #include <stdio.h>
 
+bool is_piece_null(Piece p){
+    return (p.l.c == '\0' || p.l.n == 0);
+}
+
 void draw_piece(Texture2D spritesheet, VTablePiece piece){
     SpriteSheetPosition ss_pos = piece_to_ss_position(CALL(piece, get_info));
     DrawTexturePro(spritesheet, ss_pos.s, ss_pos.d, (Vector2){0, 0}, 0, WHITE);
+}
+
+void print_table(Piece table[8][8]){
+    for(int x = 0; x < 8; x++){
+        for(int y = 0; y < 8; y++){
+            Piece p = table[x][y];
+            if(!is_piece_null(p))
+                printf("piece -> %d:%c\n", p.l.n, p.l.c);
+        }
+    }
 }
 
 SpriteSheetPosition piece_to_ss_position(Piece piece){
@@ -12,8 +26,8 @@ SpriteSheetPosition piece_to_ss_position(Piece piece){
     s_x = piece.t * (1884 / 6);
     s_y = piece.p * (604 / 2);
 
-    d_x = (piece.pl.c - 97) * 100;
-    d_y = (8 - piece.pl.n) * 100;
+    d_x = (piece.l.c - 97) * 100;
+    d_y = (8 - piece.l.n) * 100;
 
     return (SpriteSheetPosition){
         .s = (Rectangle){s_x, s_y, 314, 302},
@@ -21,9 +35,9 @@ SpriteSheetPosition piece_to_ss_position(Piece piece){
     };
 }
 
-Rectangle place_to_rect(Location pl){
-    float x = (pl.c - 97) * 100;
-    float y = (8 - pl.n) * 100;
+Rectangle place_to_rect(Location l){
+    float x = (l.c - 97) * 100;
+    float y = (8 - l.n) * 100;
 
     return (Rectangle){x, y, 100, 100};
 }
@@ -67,12 +81,15 @@ PieceManager* create_piece_manager(const char* sprite_name){
     manager->sprite_name = sprite_name;
     manager->spritesheet = LoadTexture(manager->sprite_name);
 
+    memset(manager->table, 0, sizeof(manager->table));
     setup_piece_manager(manager);
     
     return manager;
 }
 
 void push_piece(PieceManager* self, Piece piece){
+    self->table[piece.l.n - 1][piece.l.c - 97] = piece;
+
     for(int i = 0; i < 32; i++){
         if(ISNULL(self->pieces[i])){
             VTablePiece vtable = { 0 };
@@ -80,7 +97,7 @@ void push_piece(PieceManager* self, Piece piece){
             //TODO: add other pieces
             switch(piece.t){
             default: //Just for now
-                vtable = create_pawn(piece)->vtable;
+                vtable = create_pawn(piece, self->table)->vtable;
                 break;
             }
             self->pieces[i] = vtable;
@@ -142,7 +159,7 @@ void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
             if(CheckCollisionPointRec(mouse_pos, ss_pos.d)){
                 self->clicked_piece = vtable;
                 CALL(self->clicked_piece, on_click);
-                printf("Clicked-> %c:%d\n", piece.pl.c, piece.pl.n);
+                printf("Clicked-> %c:%d\n", piece.l.c, piece.l.n);
                 break;
             }
             self->clicked_piece = (VTablePiece){ 0 };
@@ -174,7 +191,7 @@ void destroy_piece_manager(PieceManager* self){
 }
 
 
-PawnPiece* create_pawn(Piece piece){
+PawnPiece* create_pawn(Piece piece, Piece (*table)[8]){
     PawnPiece* pawn = malloc(sizeof(PawnPiece));
     *pawn = (PawnPiece){
         .vtable = (VTablePiece){
@@ -182,9 +199,10 @@ PawnPiece* create_pawn(Piece piece){
             .set_pos = set_pawn_pos,
             .on_move = on_pawn_move,
             .on_click = on_pawn_click,
-            .draw_possible_moves = draw_possible_moves_pawn,
+            .draw_possible_moves =  draw_possible_moves_pawn,
             .impl = pawn,
         },
+        .table = table,
         .piece = piece,
         .first_move = true,
     };
@@ -197,8 +215,8 @@ Piece get_pawn_info(PawnPiece* self){
 }
 
 void set_pawn_pos(PawnPiece* self, char c, int n){
-    self->piece.pl.c = c;
-    self->piece.pl.n = n;
+    self->piece.l.c = c;
+    self->piece.l.n = n;
 }
 
 void on_pawn_move(PawnPiece* self){
@@ -208,12 +226,12 @@ void on_pawn_move(PawnPiece* self){
 void on_pawn_click(PawnPiece* self){
     if(self->first_move){
         printf("first_move of pawn\n");
-
+        print_table(self->table);
     }
 }
 
 void draw_possible_moves_pawn(PawnPiece* self){
-    Location position = self->piece.pl;
+    Location position = self->piece.l;
     Location move1 = (Location){
         .c = position.c,
         .n = position.n + 1,
