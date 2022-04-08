@@ -54,9 +54,10 @@ struct Piece{
 };
 
 bool is_piece_null(Piece p);
+bool is_loc_null(Location l);
 void draw_piece(Texture2D spritesheet, VTablePiece piece);
 SpriteSheetPosition piece_to_ss_position(Piece pos);
-Rectangle place_to_rect(Location l);
+Rectangle loc_to_rect(Location l);
 Location rectangle_to_piece(Rectangle rect);
 Rectangle vector_to_rect(Vector2 vec);
 
@@ -92,7 +93,7 @@ struct PawnPiece{
     Piece piece;
     bool first_move;
     Piece (*table)[8];
-    Piece can_go[4];
+    Location can_go[4];
 };
 
 PawnPiece* create_pawn(Piece piece, Piece (*table)[8]);

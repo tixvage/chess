@@ -2,7 +2,11 @@
 #include <stdio.h>
 
 bool is_piece_null(Piece p){
-    return (p.l.c == '\0' || p.l.n == 0);
+    return is_loc_null(p.l);
+}
+
+bool is_loc_null(Location l){
+    return (l.c == '\0' || l.n == 0);
 }
 
 void draw_piece(Texture2D spritesheet, VTablePiece piece){
@@ -35,7 +39,7 @@ SpriteSheetPosition piece_to_ss_position(Piece piece){
     };
 }
 
-Rectangle place_to_rect(Location l){
+Rectangle loc_to_rect(Location l){
     float x = (l.c - 97) * 100;
     float y = (8 - l.n) * 100;
 
@@ -142,7 +146,6 @@ void setup_piece_manager(PieceManager* self){
 }
 
 void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
-    //TODO: pieces can't move on each others
     if(!ISNULL(self->clicked_piece)){
         Location new_pos = rectangle_to_piece(vector_to_rect(mouse_pos));
         CALL(self->clicked_piece, set_pos, new_pos.c, new_pos.n);
@@ -207,6 +210,8 @@ PawnPiece* create_pawn(Piece piece, Piece (*table)[8]){
         .first_move = true,
     };
 
+    memset(pawn->can_go, 0, sizeof(pawn->can_go));
+
     return pawn;
 }
 
@@ -220,30 +225,44 @@ void set_pawn_pos(PawnPiece* self, char c, int n){
 }
 
 void on_pawn_move(PawnPiece* self){
+    memset(self->can_go, 0, sizeof(self->can_go));
+
     if(self->first_move) self->first_move = false;
 }
 
 void on_pawn_click(PawnPiece* self){
     if(self->first_move){
-        printf("first_move of pawn\n");
-        print_table(self->table);
+        //Player = White
+        Location cl = self->piece.l;
+        Location ul1 = (Location){
+            .c = cl.c,
+            .n = cl.n + 1,
+        };
+        Location ul2 = (Location){
+            .c = cl.c,
+            .n = cl.n + 2,
+        };
+
+        self->can_go[0] = ul1;
+        self->can_go[1] = ul2;
+    } else{
+        //Player = White
+        Location cl = self->piece.l;
+        Location ul = (Location){
+            .c = cl.c,
+            .n = cl.n + 1,
+        };
+
+        self->can_go[0] = ul;
     }
 }
 
 void draw_possible_moves_pawn(PawnPiece* self){
-    Location position = self->piece.l;
-    Location move1 = (Location){
-        .c = position.c,
-        .n = position.n + 1,
-    };
-    Location move2 = (Location){
-        .c = position.c,
-        .n = position.n + 2,
-    };
-
-    Rectangle r1 = place_to_rect(move1);
-    Rectangle r2 = place_to_rect(move2);
-
-    DrawRectangleRec(r1, (Color){0, 228, 48, 100});
-    DrawRectangleRec(r2, (Color){0, 228, 48, 100});
+    for(int i = 0; i < 4; i++){
+        Location loc = self->can_go[i];
+        if(!is_loc_null(loc)){
+            Rectangle rec = loc_to_rect(loc);
+            DrawRectangleRec(rec, (Color){0, 228, 48, 100});
+        }
+    }
 }
