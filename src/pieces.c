@@ -147,6 +147,7 @@ void setup_piece_manager(PieceManager* self){
 
 void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
     if(!ISNULL(self->clicked_piece)){
+        //TODO: add VTablePiece -> get_possible_moves and check
         Location new_pos = rectangle_to_piece(vector_to_rect(mouse_pos));
         CALL(self->clicked_piece, set_pos, new_pos.c, new_pos.n);
         CALL(self->clicked_piece, on_move);
