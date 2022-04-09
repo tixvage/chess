@@ -9,8 +9,12 @@ bool is_loc_null(Location l){
     return (l.c == '\0' || l.n == 0);
 }
 
+bool is_locs_eq(Location l1, Location l2){
+    return (l1.c == l2.c && l1.n == l2.n);
+}
+
 void draw_piece(Texture2D spritesheet, VTablePiece piece){
-    SpriteSheetPosition ss_pos = piece_to_ss_position(CALL(piece, get_info));
+    SpriteSheetPosition ss_pos = piece_to_ss_position(*(CALL(piece, get_info)));
     DrawTexturePro(spritesheet, ss_pos.s, ss_pos.d, (Vector2){0, 0}, 0, WHITE);
 }
 
@@ -59,6 +63,19 @@ Location rectangle_to_piece(Rectangle rect){
     };
 }
 
+Location table_array_to_loc(int f_i, int s_i){
+    int n = 0;
+    char c = 0;
+
+    c = s_i + 97;
+    n = f_i + 1;
+
+    return (Location){
+        .c = c,
+        .n = n,
+    };
+}
+
 Rectangle vector_to_rect(Vector2 vec){
     int len_x = log10(vec.x);
     float div_x = pow(10, len_x);
@@ -87,6 +104,8 @@ PieceManager* create_piece_manager(const char* sprite_name){
 
     RESET_ARRAY(manager->table);
     setup_piece_manager(manager);
+
+    print_table(manager->table);
     
     return manager;
 }
@@ -94,6 +113,9 @@ PieceManager* create_piece_manager(const char* sprite_name){
 void push_piece(PieceManager* self, Piece piece){
     self->table[piece.l.n - 1][piece.l.c - 97] = piece;
 
+    RESET_ARRAY(piece.p_m.can_go);
+    piece.p_m.length = 0;
+    
     for(int i = 0; i < 32; i++){
         if(ISNULL(self->pieces[i])){
             VTablePiece vtable = { 0 };
@@ -147,10 +169,32 @@ void setup_piece_manager(PieceManager* self){
 
 void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
     if(!ISNULL(self->clicked_piece)){
-        //TODO: add VTablePiece -> get_possible_moves and check
-        Location new_pos = rectangle_to_piece(vector_to_rect(mouse_pos));
-        CALL(self->clicked_piece, set_pos, new_pos.c, new_pos.n);
-        CALL(self->clicked_piece, on_move);
+        Piece* p = CALL(self->clicked_piece, get_info);
+        Location new_pos = rectangle_to_piece(vector_to_rect(mouse_pos)); // h:7
+
+        bool overlap = true;
+
+        //TODO: update table
+        //TODO: no piece can't jump on each others
+        for(int i = 0; i < p->p_m.length; i++){
+            Location loc = p->p_m.can_go[i];
+            Piece m_p = self->table[loc.n - 1][loc.c - 97];
+            if(is_piece_null(m_p) && is_locs_eq(loc, new_pos)){
+                overlap = false;
+            } else if(!is_piece_null(m_p)) {
+                overlap = true;
+                self->clicked_piece = (VTablePiece){ 0 };
+                return;
+            }
+        }
+
+        RESET_ARRAY(p->p_m.can_go);
+        p->p_m.length = 0;
+
+        if(!overlap){
+            CALL(self->clicked_piece, set_pos, new_pos.c, new_pos.n);
+            CALL(self->clicked_piece, on_move);
+        }
         self->clicked_piece = (VTablePiece){ 0 };
         return;
     }
@@ -158,12 +202,12 @@ void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
     for(int i = 0; i < 32; i++){
         if(!ISNULL(self->pieces[i])){
             VTablePiece vtable = self->pieces[i];
-            Piece piece = CALL(vtable, get_info);
-            SpriteSheetPosition ss_pos = piece_to_ss_position(piece);
+            Piece* piece = CALL(vtable, get_info);
+            SpriteSheetPosition ss_pos = piece_to_ss_position(*piece);
             if(CheckCollisionPointRec(mouse_pos, ss_pos.d)){
                 self->clicked_piece = vtable;
                 CALL(self->clicked_piece, on_click);
-                printf("Clicked-> %c:%d\n", piece.l.c, piece.l.n);
+                printf("Clicked-> %c:%d\n", piece->l.c, piece->l.n);
                 break;
             }
             self->clicked_piece = (VTablePiece){ 0 };
@@ -178,7 +222,13 @@ void draw_piece_manager(PieceManager* self){
         }
     }
     if(!ISNULL(self->clicked_piece)){
-        CALL(self->clicked_piece, draw_possible_moves);
+        Piece* piece = CALL(self->clicked_piece, get_info);
+
+        for(int i = 0; i < piece->p_m.length; i++){
+            Location loc = piece->p_m.can_go[i];
+            Rectangle rec = loc_to_rect(loc);
+            DrawRectangleRec(rec, (Color){0, 228, 48, 100});
+        }
     }
 }
 
@@ -216,8 +266,8 @@ PawnPiece* create_pawn(Piece piece, Piece (*table)[8]){
     return pawn;
 }
 
-Piece get_pawn_info(PawnPiece* self){
-    return self->piece;
+Piece* get_pawn_info(PawnPiece* self){
+    return &self->piece;
 }
 
 void set_pawn_pos(PawnPiece* self, char c, int n){
@@ -232,38 +282,42 @@ void on_pawn_move(PawnPiece* self){
 }
 
 void on_pawn_click(PawnPiece* self){
-    //if(self->first_move){
-    //    //Player = White
-    //    Location cl = self->piece.l;
-    //    Location ul1 = (Location){
-    //        .c = cl.c,
-    //        .n = cl.n + 1,
-    //    };
-    //    Location ul2 = (Location){
-    //        .c = cl.c,
-    //        .n = cl.n + 2,
-    //    };
-    //
-    //    self->can_go[0] = ul1;
-    //    self->can_go[1] = ul2;
-    //} else{
-    //    //Player = White
-    //    Location cl = self->piece.l;
-    //    Location ul = (Location){
-    //        .c = cl.c,
-    //        .n = cl.n + 1,
-    //    };
-    //
-    //    self->can_go[0] = ul;
-    //}
+    if(self->first_move){
+        //Player = White
+        Location cl = self->piece.l;
+        Location ul1 = (Location){
+            .c = cl.c,
+            .n = cl.n + 1,
+        };
+        Location ul2 = (Location){
+            .c = cl.c,
+            .n = cl.n + 2,
+        };
+
+        //TODO: push possible movement function
+        self->piece.p_m.can_go[0] = ul1;
+        self->piece.p_m.length++;
+        self->piece.p_m.can_go[1] = ul2;
+        self->piece.p_m.length++;
+    } else{
+        //Player = White
+        Location cl = self->piece.l;
+        Location ul = (Location){
+            .c = cl.c,
+            .n = cl.n + 1,
+        };
+
+        self->piece.p_m.can_go[0] = ul;
+        self->piece.p_m.length++;
+    }
 }
 
 void draw_possible_moves_pawn(PawnPiece* self){
-    //    for(int i = 0; i < 4; i++){
-    //        Location loc = self->can_go[i];
-    //        if(!is_loc_null(loc)){
-    //            Rectangle rec = loc_to_rect(loc);
-    //            DrawRectangleRec(rec, (Color){0, 228, 48, 100});
-    //        }
+    //for(int i = 0; i < 4; i++){
+    //    Location loc = self->can_go[i];
+    //    if(!is_loc_null(loc)){
+    //        Rectangle rec = loc_to_rect(loc);
+    //        DrawRectangleRec(rec, (Color){0, 228, 48, 100});
     //    }
+    //}
 }

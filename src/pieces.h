@@ -62,14 +62,16 @@ struct Piece{
 
 bool is_piece_null(Piece p);
 bool is_loc_null(Location l);
+bool is_locs_eq(Location l1, Location l2);
 void draw_piece(Texture2D spritesheet, VTablePiece piece);
 SpriteSheetPosition piece_to_ss_position(Piece pos);
 Rectangle loc_to_rect(Location l);
 Location rectangle_to_piece(Rectangle rect);
+Location table_array_to_loc(int f_i, int s_i);
 Rectangle vector_to_rect(Vector2 vec);
 
 struct VTablePiece{
-    Piece (*get_info)(void*);
+    Piece* (*get_info)(void*);
     void (*set_pos)(void*, char, int);
     void (*on_click)(void*);
     void (*on_move)(void*);
@@ -103,7 +105,7 @@ struct PawnPiece{
 };
 
 PawnPiece* create_pawn(Piece piece, Piece (*table)[8]);
-Piece get_pawn_info(PawnPiece* self);
+Piece* get_pawn_info(PawnPiece* self);
 void set_pawn_pos(PawnPiece* self, char c, int n);
 void on_pawn_move(PawnPiece* self);
 void on_pawn_click(PawnPiece* self);
