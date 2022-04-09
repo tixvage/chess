@@ -85,7 +85,7 @@ PieceManager* create_piece_manager(const char* sprite_name){
     manager->sprite_name = sprite_name;
     manager->spritesheet = LoadTexture(manager->sprite_name);
 
-    memset(manager->table, 0, sizeof(manager->table));
+    RESET_ARRAY(manager->table);
     setup_piece_manager(manager);
     
     return manager;
@@ -211,7 +211,7 @@ PawnPiece* create_pawn(Piece piece, Piece (*table)[8]){
         .first_move = true,
     };
 
-    memset(pawn->can_go, 0, sizeof(pawn->can_go));
+    //    memset(pawn->can_go, 0, sizeof(pawn->can_go));
 
     return pawn;
 }
@@ -226,44 +226,44 @@ void set_pawn_pos(PawnPiece* self, char c, int n){
 }
 
 void on_pawn_move(PawnPiece* self){
-    memset(self->can_go, 0, sizeof(self->can_go));
+    // memset(self->can_go, 0, sizeof(self->can_go));
 
     if(self->first_move) self->first_move = false;
 }
 
 void on_pawn_click(PawnPiece* self){
-    if(self->first_move){
-        //Player = White
-        Location cl = self->piece.l;
-        Location ul1 = (Location){
-            .c = cl.c,
-            .n = cl.n + 1,
-        };
-        Location ul2 = (Location){
-            .c = cl.c,
-            .n = cl.n + 2,
-        };
-
-        self->can_go[0] = ul1;
-        self->can_go[1] = ul2;
-    } else{
-        //Player = White
-        Location cl = self->piece.l;
-        Location ul = (Location){
-            .c = cl.c,
-            .n = cl.n + 1,
-        };
-
-        self->can_go[0] = ul;
-    }
+    //if(self->first_move){
+    //    //Player = White
+    //    Location cl = self->piece.l;
+    //    Location ul1 = (Location){
+    //        .c = cl.c,
+    //        .n = cl.n + 1,
+    //    };
+    //    Location ul2 = (Location){
+    //        .c = cl.c,
+    //        .n = cl.n + 2,
+    //    };
+    //
+    //    self->can_go[0] = ul1;
+    //    self->can_go[1] = ul2;
+    //} else{
+    //    //Player = White
+    //    Location cl = self->piece.l;
+    //    Location ul = (Location){
+    //        .c = cl.c,
+    //        .n = cl.n + 1,
+    //    };
+    //
+    //    self->can_go[0] = ul;
+    //}
 }
 
 void draw_possible_moves_pawn(PawnPiece* self){
-    for(int i = 0; i < 4; i++){
-        Location loc = self->can_go[i];
-        if(!is_loc_null(loc)){
-            Rectangle rec = loc_to_rect(loc);
-            DrawRectangleRec(rec, (Color){0, 228, 48, 100});
-        }
-    }
+    //    for(int i = 0; i < 4; i++){
+    //        Location loc = self->can_go[i];
+    //        if(!is_loc_null(loc)){
+    //            Rectangle rec = loc_to_rect(loc);
+    //            DrawRectangleRec(rec, (Color){0, 228, 48, 100});
+    //        }
+    //    }
 }

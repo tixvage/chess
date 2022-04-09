@@ -10,18 +10,19 @@
 #define PIECE(cc, nn, pp, tt) (Piece) {.l = (Location){ .c = cc, .n = nn}, .p = pp, .t = tt}
 #define CALL(i, f, args...) i.f(i.impl, ##args)
 #define ISNULL(i) (i.impl == NULL)
+#define RESET_ARRAY(array) memset(array, 0, sizeof(array))
 
-typedef enum PieceType PieceType;
-typedef enum Player Player;
+#define MAX_MOVEMENT_POSSIBLITIES 25
 
 typedef struct SpriteSheetPosition SpriteSheetPosition;
 typedef struct PawnPiece PawnPiece;
 typedef struct Location Location;
 typedef struct Piece Piece;
+typedef struct Moves Moves;
 typedef struct PieceManager PieceManager;
 typedef struct VTablePiece VTablePiece;
 
-enum PieceType{
+typedef enum{
     King = 0,
     Queen = 1,
     Bishop = 2,
@@ -29,13 +30,13 @@ enum PieceType{
     Rook = 4,
     Pawn = 5,
     NoneT = 6,
-};
+} PieceType;
 
-enum Player{
+typedef enum{
     White = 0,
     Black = 1,
     NoneP = 2,
-};
+} Player;
 
 struct SpriteSheetPosition{
     Rectangle s;
@@ -47,10 +48,16 @@ struct Location{
     int n;
 };
 
+struct Moves{
+    Location can_go[MAX_MOVEMENT_POSSIBLITIES];
+    int length;
+};
+
 struct Piece{
     Location l;
     Player p;
     PieceType t;
+    Moves p_m;
 };
 
 bool is_piece_null(Piece p);
@@ -93,7 +100,6 @@ struct PawnPiece{
     Piece piece;
     bool first_move;
     Piece (*table)[8];
-    Location can_go[4];
 };
 
 PawnPiece* create_pawn(Piece piece, Piece (*table)[8]);
