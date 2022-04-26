@@ -63,6 +63,7 @@ struct Piece{
 bool is_piece_null(Piece p);
 bool is_loc_null(Location l);
 bool is_locs_eq(Location l1, Location l2);
+void push_movement(Moves* self, Location move);
 void draw_piece(Texture2D spritesheet, VTablePiece piece);
 SpriteSheetPosition piece_to_ss_position(Piece pos);
 Rectangle loc_to_rect(Location l);
@@ -96,6 +97,8 @@ void setup_piece_manager(PieceManager* self);
 void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos);
 void draw_piece_manager(PieceManager* self);
 void destroy_piece_manager(PieceManager* self);
+
+//all pieces
 
 struct PawnPiece{
     VTablePiece vtable;

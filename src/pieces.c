@@ -1,5 +1,6 @@
 #include "pieces.h"
 #include <stdio.h>
+#include "assert.h"
 
 bool is_piece_null(Piece p){
     return is_loc_null(p.l);
@@ -11,6 +12,16 @@ bool is_loc_null(Location l){
 
 bool is_locs_eq(Location l1, Location l2){
     return (l1.c == l2.c && l1.n == l2.n);
+}
+
+void push_movement(Moves* self, Location move){
+    for(size_t i = 0; i < MAX_MOVEMENT_POSSIBLITIES; i++){
+        if(is_loc_null(self->can_go[i])){
+            self->can_go[i] = move;
+            self->length++;
+            return;
+        }
+    }
 }
 
 void draw_piece(Texture2D spritesheet, VTablePiece piece){
@@ -221,6 +232,7 @@ void draw_piece_manager(PieceManager* self){
             draw_piece(self->spritesheet, self->pieces[i]);
         }
     }
+    //TODO: check if the can_go[i] is not overlaping with any piece
     if(!ISNULL(self->clicked_piece)){
         Piece* piece = CALL(self->clicked_piece, get_info);
 
@@ -276,39 +288,71 @@ void set_pawn_pos(PawnPiece* self, char c, int n){
 }
 
 void on_pawn_move(PawnPiece* self){
-    // memset(self->can_go, 0, sizeof(self->can_go));
-
     if(self->first_move) self->first_move = false;
 }
 
 void on_pawn_click(PawnPiece* self){
     if(self->first_move){
-        //Player = White
         Location cl = self->piece.l;
-        Location ul1 = (Location){
+        Location ul1, ul2;
+        int n1, n2;
+
+        switch (self->piece.p){
+        case White: {
+            n1 = cl.n - 1;
+            n2 = cl.n - 2;
+        }
+        break;
+        
+        case Black: {
+            n1 = cl.n + 1;
+            n2 = cl.n + 2;
+        }
+        break;
+
+        default:
+            assert(0 && "Unexpected player type");
+        break;
+        }
+        
+        ul1 = (Location){
             .c = cl.c,
-            .n = cl.n + 1,
+            .n = n1,
         };
-        Location ul2 = (Location){
+        ul2 = (Location){
             .c = cl.c,
-            .n = cl.n + 2,
+            .n = n2,
         };
 
-        //TODO: push possible movement function
-        self->piece.p_m.can_go[0] = ul1;
-        self->piece.p_m.length++;
-        self->piece.p_m.can_go[1] = ul2;
-        self->piece.p_m.length++;
+        push_movement(&self->piece.p_m, ul1);
+        push_movement(&self->piece.p_m, ul2);
     } else{
-        //Player = White
         Location cl = self->piece.l;
-        Location ul = (Location){
+        Location ul;
+        int n1;
+
+        switch (self->piece.p){
+        case White: {
+            n1 = cl.n - 1;
+        }
+        break;
+        
+        case Black: {
+            n1 = cl.n + 1;
+        }
+        break;
+
+        default:
+            assert(0 && "Unexpected player type");
+        break;
+        }
+
+        ul = (Location){
             .c = cl.c,
-            .n = cl.n + 1,
+            .n = n1,
         };
 
-        self->piece.p_m.can_go[0] = ul;
-        self->piece.p_m.length++;
+        push_movement(&self->piece.p_m, ul);
     }
 }
 
