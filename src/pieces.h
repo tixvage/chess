@@ -76,7 +76,6 @@ struct VTablePiece{
     void (*set_pos)(void*, char, int);
     void (*on_click)(void*);
     void (*on_move)(void*);
-    void (*draw_possible_moves)(void*);
 
     void* impl;
 };
@@ -112,6 +111,5 @@ Piece* get_pawn_info(PawnPiece* self);
 void set_pawn_pos(PawnPiece* self, char c, int n);
 void on_pawn_move(PawnPiece* self);
 void on_pawn_click(PawnPiece* self);
-void draw_possible_moves_pawn(PawnPiece* self);
 
 #endif // PIECES_H

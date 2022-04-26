@@ -264,7 +264,6 @@ PawnPiece* create_pawn(Piece piece, Piece (*table)[8]){
             .set_pos = set_pawn_pos,
             .on_move = on_pawn_move,
             .on_click = on_pawn_click,
-            .draw_possible_moves =  draw_possible_moves_pawn,
             .impl = pawn,
         },
         .table = table,
@@ -351,14 +350,4 @@ void on_pawn_click(PawnPiece* self){
 
         push_movement(&self->piece.p_m, ul);
     }
-}
-
-void draw_possible_moves_pawn(PawnPiece* self){
-    //for(int i = 0; i < 4; i++){
-    //    Location loc = self->can_go[i];
-    //    if(!is_loc_null(loc)){
-    //        Rectangle rec = loc_to_rect(loc);
-    //        DrawRectangleRec(rec, (Color){0, 228, 48, 100});
-    //    }
-    //}
 }
