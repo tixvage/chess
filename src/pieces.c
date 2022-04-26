@@ -186,7 +186,6 @@ void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
         bool overlap = true;
 
         //TODO: update table
-        //TODO: no piece can't jump on each others
         for(int i = 0; i < p->p_m.length; i++){
             Location loc = p->p_m.can_go[i];
             Piece m_p = self->table[loc.n - 1][loc.c - 97];
@@ -272,8 +271,6 @@ PawnPiece* create_pawn(Piece piece, Piece (*table)[8]){
         .piece = piece,
         .first_move = true,
     };
-
-    //    memset(pawn->can_go, 0, sizeof(pawn->can_go));
 
     return pawn;
 }
