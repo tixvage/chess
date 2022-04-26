@@ -170,7 +170,7 @@ void setup_piece_manager(PieceManager* self){
 void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
     if(!ISNULL(self->clicked_piece)){
         Piece* p = CALL(self->clicked_piece, get_info);
-        Location new_pos = rectangle_to_piece(vector_to_rect(mouse_pos)); // h:7
+        Location new_pos = rectangle_to_piece(vector_to_rect(mouse_pos));
 
         bool overlap = true;
 

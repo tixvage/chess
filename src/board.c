@@ -3,16 +3,14 @@
 Board create_board(){
     RenderTexture2D texture = LoadRenderTexture(800, 800);
 
-    Color current_color = GRAY;
-    
     BeginTextureMode(texture);
     for(int32_t x = 0; x < 8; x++){
-        current_color = is_color_equal(current_color, GRAY) ? WHITE : GRAY;
         for(int32_t y = 0; y < 8; y++){
-            current_color = is_color_equal(current_color, GRAY) ? WHITE : GRAY;
-            DrawRectangle(x * 100, y * 100, 100, 100, current_color);
+            Color color = (x + y) % 2 == 0 ? WHITE : GRAY;
+            DrawRectangle(x * 100, y * 100, 100, 100, color);
         }
     }
+    
     EndTextureMode();
     
     return (Board){
