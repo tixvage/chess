@@ -73,7 +73,6 @@ Rectangle vector_to_rect(Vector2 vec);
 
 struct VTablePiece{
     Piece* (*get_info)(void*);
-    void (*set_pos)(void*, char, int);
     void (*on_click)(void*);
     void (*on_move)(void*);
 
@@ -108,7 +107,6 @@ struct PawnPiece{
 
 PawnPiece* create_pawn(Piece piece, Piece (*table)[8]);
 Piece* get_pawn_info(PawnPiece* self);
-void set_pawn_pos(PawnPiece* self, char c, int n);
 void on_pawn_move(PawnPiece* self);
 void on_pawn_click(PawnPiece* self);
 

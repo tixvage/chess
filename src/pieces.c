@@ -184,6 +184,7 @@ void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
         Location new_pos = rectangle_to_piece(vector_to_rect(mouse_pos));
 
         bool overlap = true;
+        //self->table[piece.l.n - 1][piece.l.c - 97] = piece;
 
         //TODO: update table
         for(int i = 0; i < p->p_m.length; i++){
@@ -202,7 +203,7 @@ void on_mouse_click_piece_manager(PieceManager* self, Vector2 mouse_pos){
         p->p_m.length = 0;
 
         if(!overlap){
-            CALL(self->clicked_piece, set_pos, new_pos.c, new_pos.n);
+            CALL(self->clicked_piece, get_info)->l = new_pos;
             CALL(self->clicked_piece, on_move);
         }
         self->clicked_piece = (VTablePiece){ 0 };
@@ -261,7 +262,6 @@ PawnPiece* create_pawn(Piece piece, Piece (*table)[8]){
     *pawn = (PawnPiece){
         .vtable = (VTablePiece){
             .get_info = get_pawn_info,
-            .set_pos = set_pawn_pos,
             .on_move = on_pawn_move,
             .on_click = on_pawn_click,
             .impl = pawn,
