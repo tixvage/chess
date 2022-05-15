@@ -259,7 +259,6 @@ void destroy_piece_manager(PieceManager* self){
     free(self);
 }
 
-
 PawnPiece* create_pawn(Piece piece, Piece (*table)[8]){
     PawnPiece* pawn = malloc(sizeof(PawnPiece));
     *pawn = (PawnPiece){
